@@ -1,7 +1,12 @@
 import requests
 import sys
+import datetime
 
-url = 'https://api.github.com/search/repositories?q=created:>2017-06-21&sort=stars&order=desc'
+
+last_week = datetime.datetime.now() - datetime.timedelta(7)
+url = 'https://api.github.com/search/repositories?' + \
+      'q=created:>2017-0{}-{}&sort=stars&order=desc'.format(last_week.month,
+                                                           last_week.day)
 
 
 def check_connect(url):
@@ -27,7 +32,7 @@ def printing_result(top_repo):
 def main():
     response = check_connect(url)
     top = get_trending_repositories(response.json())
-    print_result(top)
+    printing_result(top)
 
 
 if __name__ == '__main__':
