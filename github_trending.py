@@ -1,20 +1,25 @@
-import requests
+﻿import requests
 import sys
 import datetime
 
 
 last_week = datetime.datetime.now() - datetime.timedelta(7)
+current_month = str(last_week.month).zfill(2)
+current_day = last_week.day
 url = 'https://api.github.com/search/repositories?' + \
-      'q=created:>2017-0{}-{}&sort=stars&order=desc'.format(last_week.month,
-                                                           last_week.day)
+      'q=created:>2017-{}-{}&sort=stars&order=desc'.format(current_month,
+                                                           current_day)
 
 
 def check_connect(url):
-    r = requests.get(url)
+    try:
+        r = requests.get(url)
+    except requests.exceptions.ConnectionError:
+        return None
     if r.status_code == 200:
         return r
     else:
-        return sys.exit('You have the problem to connect...')
+        return None
 
 
 def get_trending_repositories(top_size):
@@ -31,8 +36,11 @@ def printing_result(top_repo):
 
 def main():
     response = check_connect(url)
-    top = get_trending_repositories(response.json())
-    printing_result(top)
+    if response:
+        top = get_trending_repositories(response.json())
+        printing_result(top)
+    else:
+        print('You have the problem to connect...')
 
 
 if __name__ == '__main__':
