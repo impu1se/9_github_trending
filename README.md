@@ -1,6 +1,6 @@
 # Github Trends
 
-[TODO. There will be project description]
+This project are looking for repositories created by last week, which have greatest 'Star' and printing twenty repo url with number open issues.
 
 # Project Goals
 
