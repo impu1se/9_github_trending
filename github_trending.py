@@ -13,18 +13,18 @@ url = 'https://api.github.com/search/repositories?' + \
 
 def check_connect(url):
     try:
-        r = requests.get(url)
+        response = requests.get(url)
     except requests.exceptions.ConnectionError:
         return None
-    if r.status_code == 200:
-        return r
+    if response.status_code == 200:
+        return response
     else:
         return None
 
 
-def get_trending_repositories(top_size):
+def get_trending_repositories(data_stream):
     top_repo = []
-    for repo in top_size['items']:
+    for repo in data_stream['items']:
         top_repo.append((repo['html_url'], repo['open_issues_count']))
     return top_repo[:20]
 
@@ -37,8 +37,8 @@ def printing_result(top_repo):
 def main():
     response = check_connect(url)
     if response:
-        top = get_trending_repositories(response.json())
-        printing_result(top)
+        top_repo = get_trending_repositories(response.json())
+        printing_result(top_repo)
     else:
         print('You have the problem to connect...')
 
