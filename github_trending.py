@@ -1,18 +1,12 @@
 import requests
 import datetime
+from time import sleep
 
 
-last_week = datetime.datetime.now() - datetime.timedelta(7)
-current_month = str(last_week.month).zfill(2)
-current_day = last_week.day
-url = 'https://api.github.com/search/repositories?' + \
-      'q=created:>2017-{}-{}&sort=stars&order=desc'.format(current_month,
-                                                           current_day)
-
-
-def check_connect(url):
+def check_connect(url, payload):
     try:
-        response = requests.get(url)
+        response = requests.get(url, params=payload)
+        sleep(0.5)
     except requests.exceptions.ConnectionError:
         return None
     if response.status_code == 200:
@@ -23,9 +17,9 @@ def check_connect(url):
 
 def get_trending_repositories(data_stream):
     top_repo = []
-    for repo in data_stream['items']:
+    for repo in data_stream:
         top_repo.append((repo['html_url'], repo['open_issues_count']))
-    return top_repo[:20]
+    return top_repo
 
 
 def printing_result(top_repo):
@@ -34,9 +28,15 @@ def printing_result(top_repo):
 
 
 def main():
-    response = check_connect(url)
+    req_date = datetime.datetime.now() - datetime.timedelta(weeks=1)
+    payload = {'q': 'created:>2017-' + str(req_date.month).zfill(2) + 
+               '-' + str(req_date.day), 
+               'sort': 'stars',
+               'order': 'desc'}
+    url = 'https://api.github.com/search/repositories'
+    response = check_connect(url, payload).json()['items'][:20]
     if response:
-        top_repo = get_trending_repositories(response.json())
+        top_repo = get_trending_repositories(response)
         printing_result(top_repo)
     else:
         print('You have the problem to connect...')
