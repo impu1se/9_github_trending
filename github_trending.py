@@ -28,7 +28,8 @@ def printing_result(top_repo):
 
 
 def main():
-    req_date = datetime.datetime.now() - datetime.timedelta(weeks=1)
+    weeks = 1
+    req_date = datetime.datetime.now() - datetime.timedelta(weeks=weeks)
     payload = {'q': 'created:>2017-' + str(req_date.month).zfill(2) + 
                '-' + str(req_date.day), 
                'sort': 'stars',
