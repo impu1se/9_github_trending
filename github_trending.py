@@ -6,8 +6,8 @@ from time import sleep
 def check_connect(url, payload):
     try:
         response = requests.get(url, params=payload)
-        time_to_sleep = 0.5
-        sleep(time_to_sleep)
+        timeout = 0.5
+        sleep(timeout)
     except requests.exceptions.ConnectionError:
         return None
     if response.status_code == 200:
