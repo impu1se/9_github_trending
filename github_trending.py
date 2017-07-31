@@ -30,15 +30,18 @@ def printing_result(top_repo):
 
 def main():
     weeks = 1
+    width = 2
     req_date = datetime.datetime.now() - datetime.timedelta(weeks=weeks)
-    payload = {'q': 'created:>2017-' + str(req_date.month).zfill(width=2) + 
+    payload = {'q': 'created:>2017-' + str(req_date.month).zfill(width) + 
                '-' + str(req_date.day), 
                'sort': 'stars',
-               'order': 'desc'}
+               'order': 'desc',
+               'page': '1',
+               'per_page': '20'}
     url = 'https://api.github.com/search/repositories'
-    response = check_connect(url, payload).json()['items'][:20]
+    response = check_connect(url, payload)
     if response:
-        top_repo = get_trending_repositories(response)
+        top_repo = get_trending_repositories(response.json()['items'])
         printing_result(top_repo)
     else:
         print('You have the problem to connect...')
