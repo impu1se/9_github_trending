@@ -3,22 +3,33 @@ import datetime
 from time import sleep
 
 
-def check_connect(url, payload):
+def check_connect(url):
     try:
-        response = requests.get(url, params=payload)
+        response = requests.get(url)
         timeout = 0.5
         sleep(timeout)
     except requests.exceptions.ConnectionError:
         return None
-    if response.status_code == 200:
+    if response.ok:
         return response
     else:
         return None
 
 
-def get_trending_repositories(data_stream):
+def get_trending_repositories(url):
+    weeks = 1
+    width = 2
+    req_date = datetime.datetime.now() - datetime.timedelta(weeks=weeks)
+    payload = {'q': 'created:>2017-' + str(req_date.month).zfill(width) + 
+               '-' + str(req_date.day), 
+               'sort': 'stars',
+               'order': 'desc',
+               'page': '1',
+               'per_page': '20'}
+    data_stream = requests.get(url + '/search/repositories',
+                               params=payload).json()
     top_repo = []
-    for repo in data_stream:
+    for repo in data_stream['items']:
         top_repo.append((repo['html_url'], repo['open_issues_count']))
     return top_repo
 
@@ -29,19 +40,10 @@ def printing_result(top_repo):
 
 
 def main():
-    weeks = 1
-    width = 2
-    req_date = datetime.datetime.now() - datetime.timedelta(weeks=weeks)
-    payload = {'q': 'created:>2017-' + str(req_date.month).zfill(width) + 
-               '-' + str(req_date.day), 
-               'sort': 'stars',
-               'order': 'desc',
-               'page': '1',
-               'per_page': '20'}
-    url = 'https://api.github.com/search/repositories'
-    response = check_connect(url, payload)
+    url = 'https://api.github.com'
+    response = check_connect(url)
     if response:
-        top_repo = get_trending_repositories(response.json()['items'])
+        top_repo = get_trending_repositories(url)
         printing_result(top_repo)
     else:
         print('You have the problem to connect...')
